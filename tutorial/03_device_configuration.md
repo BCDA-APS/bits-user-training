@@ -41,15 +41,7 @@ specific meanings.  Feel free to use other labels at your choice:
 
 ## Step-by-Step Configuration
 
-### 1. Backup Original Configuration
-
-```bash
-# Save the original simulation config
-cd src/my_instrument/configs/
-cp devices.yml devices_simulation_backup.yml
-```
-
-### 2. Create IOC Device Configuration
+### 1. Create IOC Device Configuration
 
 Replace the contents of `configs/devices.yml`:
 
@@ -115,7 +107,7 @@ ophyd.EpicsSignal:
   labels: ["calculations"]
 ```
 
-### 3. Test Configuration Syntax
+### 2. Test Configuration Syntax
 
 ```bash
 # Verify YAML syntax
@@ -131,7 +123,7 @@ with open('devices.yml') as f:
 "
 ```
 
-### 4. Test Device Loading
+### 3. Test Device Loading
 
 ```bash
 # Start IPython to test device loading
@@ -151,7 +143,7 @@ from my_instrument.startup import *
 - Some connection warnings (normal during startup)
 - No critical errors
 
-### 5. Test Device Connectivity
+### 4. Test Device Connectivity
 
 ```python
 # Test motor connectivity
@@ -170,7 +162,7 @@ print(f"simdet connected: {simdet.connected}")
 print(f"simdet image size: {simdet.cam.array_size.get()}")
 ```
 
-### 6. Test Basic Device Operations
+### 5. Test Basic Device Operations
 
 ```python
 # Test motor motion (small relative moves)
@@ -319,62 +311,6 @@ scan_motor.connected
 scan_motor.component_names
 ```
 Try writing the device name and pressing tab in your ipython terminal to see what else you can find out about your devices
-
-## Troubleshooting Common Issues
-
-### 1. PV Connection Failures
-
-```python
-# Check specific PV connectivity
-import epics
-pv = epics.PV("gp:m1.RBV")
-print(f"Connected: {pv.wait_for_connection(timeout=5)}")
-print(f"Value: {pv.get()}")
-
-# Check EPICS environment
-import os
-print(f"EPICS_CA_ADDR_LIST: {os.environ.get('EPICS_CA_ADDR_LIST', 'Not set')}")
-print(f"EPICS_CA_AUTO_ADDR_LIST: {os.environ.get('EPICS_CA_AUTO_ADDR_LIST', 'Not set')}")
-```
-
-**Solutions:**
-
-In your terminal shell:
-```bash
-# Set EPICS environment if needed
-export EPICS_CA_AUTO_ADDR_LIST=YES
-
-# Check if IOCs are still running
-podman ps | grep -E "(adsim_ioc|gp_ioc)"
-```
-
-### 2. YAML Syntax Errors
-
-```bash
-# Validate YAML syntax
-cd /src/my_instrument/
-python -c "
-import yaml
-try:
-    with open('configs/devices.yml') as f:
-        yaml.safe_load(f)
-    print('✅ YAML syntax is correct')
-except yaml.YAMLError as e:
-    print(f'❌ YAML syntax error: {e}')
-"
-```
-
-### 4. Timeout Issues
-
-Edit `configs/iconfig.yml` to increase timeouts:
-
-```yaml
-OPHYD:
-    TIMEOUTS:
-        PV_READ: 10      # Increase from 5
-        PV_WRITE: 10     # Increase from 5
-        PV_CONNECTION: 10 # Increase from 5
-```
 
 ## Best Practices
 
