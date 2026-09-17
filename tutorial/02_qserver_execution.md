@@ -19,8 +19,7 @@ with the queueserver API.
 
 ✅ Completed Step 01 (IPython Interactive Execution)
 ✅ Working instrument package (`from my_instrument.startup import *` succeeds)
-✅ Working device configurations and at least one plan to run
-✅ IOCs running and responsive
+✅ The default simulated devices `sim_motor` and `sim_det` (no IOCs required for this step)
 ✅ **Redis** available on `localhost:6379` (the QS host requires it)
 
 ## Understanding the Queue Server
@@ -34,7 +33,7 @@ with the queueserver API.
 | Remote control | No | Yes (over ZMQ) |
 | Unattended batches | Manual | Queue executes in order |
 | Same `startup.py`? | Yes | Yes (loaded by the host) |
-| Plan style | `RE(bp.count([det]))` | Submit `BPlan("count", [det])` |
+| Plan style | `RE(bp.count([sim_det]))` | Submit `BPlan("count", ["sim_det"])` |
 
 The key idea: the queueserver host loads the **same `startup.py`** as your
 IPython session, so the same devices and plans are available. You just talk to it
@@ -226,8 +225,8 @@ Key fields:
 
 Because the host loads your `startup.py`, the plans available in the queue are the
 same ones you use in IPython — but you refer to them by **name** (a string), not
-by calling them. For example, IPython's `RE(bp.count([scaler1], num=5))` becomes
-the queue item `BPlan("count", ["scaler1"], num=5)`.
+by calling them. For example, IPython's `RE(bp.count([sim_det], num=5))` becomes
+the queue item `BPlan("count", ["sim_det"], num=5)`.
 
 ### Option A — The `queue-monitor` GUI (recommended to start)
 
@@ -281,8 +280,8 @@ api.environment_open()
 api.wait_for_idle()          # wait until the environment is ready
 
 # 2. Build a plan by NAME and add it to the queue
-#    Equivalent to RE(bp.count([scaler1], num=5)) in IPython
-plan = BPlan("count", ["scaler1"], num=5)
+#    Equivalent to RE(bp.count([sim_det], num=5)) in IPython
+plan = BPlan("count", ["sim_det"], num=5)
 api.item_add(plan)
 
 # 3. Start the queue
@@ -297,8 +296,8 @@ print(api.status())
 
 ```python
 # Add several items, then run them all in order
-api.item_add(BPlan("scan", ["scaler1"], "m1", -1, 1, 11))
-api.item_add(BPlan("rel_scan", ["scaler1"], "m1", -0.5, 0.5, 11))
+api.item_add(BPlan("scan", ["sim_det"], "sim_motor", -1, 1, 11))
+api.item_add(BPlan("rel_scan", ["sim_det"], "sim_motor", -0.5, 0.5, 11))
 
 # Inspect the queue and history
 print(api.queue_get())        # pending items
@@ -313,8 +312,8 @@ api.re_resume()               # resume it
 api.environment_close()
 ```
 
-**Note**: device and detector names are passed as **strings** (`"scaler1"`,
-`"m1"`) — the host resolves them to the objects created by your `startup.py`.
+**Note**: device and detector names are passed as **strings** (`"sim_det"`,
+`"sim_motor"`) — the host resolves them to the objects created by your `startup.py`.
 
 </details>
 
@@ -326,7 +325,7 @@ shell scripts:
 ```bash
 qserver status                       # host + queue status
 qserver environment open             # load startup.py on the host
-qserver queue add plan '{"name": "count", "args": [["scaler1"], 5]}'
+qserver queue add plan '{"name": "count", "args": [["sim_det"], 5]}'
 qserver queue start                  # run the queue
 qserver environment close
 ```
@@ -350,8 +349,8 @@ user_groups:
       - ":^count"              # only plans starting with "count"
       - ":scan$"               # ...and ending with "scan"
     allowed_devices:
-      - ":^det:?.*"
-      - ":^motor:?.*"
+      - ":^sim_det:?.*"
+      - ":^sim_motor:?.*"
 ```
 
 If a plan or device you expect is missing from the monitor, this file is the
@@ -382,7 +381,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 api = REManagerAPI()
 api.environment_open(); api.wait_for_idle()
 
-api.item_add(BPlan("count", ["scaler1"], num=1))
+api.item_add(BPlan("count", ["sim_det"], num=1))
 api.queue_start()
 api.wait_for_idle()
 
@@ -442,8 +441,8 @@ If the host is unrecoverable, restart it:
    configs, plans, or permissions — the host caches them on import.
 2. **Watch the console** during first runs (`console`) to catch import and
    connection issues early. Detach with `Ctrl-a d`, never `Ctrl-c`.
-3. **Test plans in IPython first**: if `RE(bp.count([scaler1]))` works
-   interactively, `BPlan("count", ["scaler1"])` will work in the queue.
+3. **Test plans in IPython first**: if `RE(bp.count([sim_det]))` works
+   interactively, `BPlan("count", ["sim_det"])` will work in the queue.
 4. **Keep the queue readable**: add descriptive metadata and clear old history
    periodically.
 5. **Use `checkup` for resilience**: a cron job running
@@ -499,10 +498,10 @@ With remote/queued operation working, continue building out your instrument:
 
 | IPython (interactive) | Queue Server (`BPlan`) |
 |-----------------------|------------------------|
-| `RE(bp.count([scaler1], num=5))` | `BPlan("count", ["scaler1"], num=5)` |
-| `RE(bp.scan([scaler1], m1, -1, 1, 11))` | `BPlan("scan", ["scaler1"], "m1", -1, 1, 11)` |
-| `RE(bp.rel_scan([scaler1], m1, -0.5, 0.5, 11))` | `BPlan("rel_scan", ["scaler1"], "m1", -0.5, 0.5, 11)` |
-| `RE(my_custom_plan(m1, scaler1))` | `BPlan("my_custom_plan", "m1", "scaler1")` |
+| `RE(bp.count([sim_det], num=5))` | `BPlan("count", ["sim_det"], num=5)` |
+| `RE(bp.scan([sim_det], sim_motor, -1, 1, 11))` | `BPlan("scan", ["sim_det"], "sim_motor", -1, 1, 11)` |
+| `RE(bp.rel_scan([sim_det], sim_motor, -0.5, 0.5, 11))` | `BPlan("rel_scan", ["sim_det"], "sim_motor", -0.5, 0.5, 11)` |
+| `RE(sim_rel_scan_plan(num=11))` | `BPlan("sim_rel_scan_plan", num=11)` |
 
 Custom plans loaded by `startup.py` are available in the queue automatically —
 refer to them by their function name as a string.

@@ -373,7 +373,7 @@ With working device configurations, you're ready to:
 2. Test different scanning patterns
 3. Analyze the data generated
 
-**Next Step**: [Plan Development](03_plan_development.md)
+**Next Step**: [Plan Development](04_plan_development.md)
 
 ---
 

@@ -379,7 +379,7 @@ def batch_sample_measurement(sample_positions, measurement_plan,
 
 ### 3. Load Your Custom Plans Into Your Instrument
 
-Edit `src/my_beamline/startup.py` to automatically load custom plans:
+Edit `src/my_instrument/startup.py` to automatically load custom plans:
 
 ```python
 # Add at the end of startup.py
@@ -651,7 +651,7 @@ git commit -m "Add custom scan plans
 "
 ```
 
-**Next Step**: [IPython Interactive Use](04_ipython_execution.md)
+**Next Step**: [IPython Interactive Use](01_ipython_execution.md)
 
 ---
 

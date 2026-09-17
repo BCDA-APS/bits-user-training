@@ -23,24 +23,22 @@ This comprehensive tutorial takes beamline scientists from understanding their E
 
 | Step | Topic | Duration | Deliverable |
 |------|-------|----------|-------------|
-| [00](tutorial/00_bits_starter_setup.md) | Introduction & Prerequisites | 10 min | Environment setup |
-| [01](tutorial/01_ioc_exploration.md) | IOC Exploration & Device Discovery | 20 min | Device inventory |
-| [02](tutorial/02_device_configuration.md) | Device Configuration | 30 min | Working devices |
-| [03](tutorial/03_plan_development.md) | Scan Plan Development | 25 min | Custom plans |
-| [04](tutorial/04_ipython_execution.md) | IPython Interactive Use | 15 min | Live operation |
+| [01](tutorial/01_ipython_execution.md) | IPython Interactive Execution | 30 min | Live interactive operation |
+| [02](tutorial/02_qserver_execution.md) | Queue Server Execution | 30 min | Remote/queued operation |
+| [03](tutorial/03_device_configuration.md) | Device Configuration | 30 min | Working devices |
+| [04](tutorial/04_plan_development.md) | Plan Development | 30 min | Custom scan plans |
 
 ### Quick Start
 
 ```bash
 # 1. Start the demo IOCs
-cd bits_demo/scripts
-./start_demo_iocs.sh
+./scripts/start_demo_iocs.sh
 
 # 2. Explore your IOCs
-python explore_iocs.py
+python scripts/explore_iocs.py
 
 # 3. Follow the tutorial step by step
-# Start with tutorial/00_introduction.md
+# Start with tutorial/01_ipython_execution.md
 ```
 
 ### What You'll Learn
@@ -95,4 +93,4 @@ After completing this tutorial:
 
 ---
 
-**Ready to start?** → Begin with [Tutorial Introduction](tutorial/00_bits_starter_setup.md)
+**Ready to start?** → Begin with [IPython Interactive Execution](tutorial/01_ipython_execution.md)
